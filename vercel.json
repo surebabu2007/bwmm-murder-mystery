@@ -21,18 +21,6 @@
         {
           "key": "Cross-Origin-Resource-Policy",
           "value": "cross-origin"
-        },
-        {
-          "key": "Cross-Origin-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Cross-Origin-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Cross-Origin-Allow-Headers",
-          "value": "Content-Type, Authorization, X-Requested-With"
         }
       ]
     },
@@ -50,6 +38,10 @@
         {
           "key": "Content-Type",
           "value": "application/wasm"
+        },
+        {
+          "key": "Cross-Origin-Allow-Origin",
+          "value": "*"
         }
       ]
     },
@@ -59,6 +51,49 @@
         {
           "key": "Content-Type",
           "value": "application/octet-stream"
+        },
+        {
+          "key": "Cross-Origin-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/renpy.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        },
+        {
+          "key": "Cross-Origin-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/renpy-pre.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        },
+        {
+          "key": "Cross-Origin-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/game.zip",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/zip"
+        },
+        {
+          "key": "Cross-Origin-Allow-Origin",
+          "value": "*"
         }
       ]
     },
@@ -68,65 +103,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Cross-Origin-Allow-Origin",
+          "value": "*"
         }
       ]
     },
     {
       "source": "/icons/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.js)$",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.wasm)$",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.data)$",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.mp3)$",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.ogg)$",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.webm)$",
       "headers": [
         {
           "key": "Cache-Control",

@@ -1,0 +1,32 @@
+{
+  "name": "bwmm-murder-mystery",
+  "version": "1.0.0",
+  "description": "Blackwood Manor Mystery - Interactive Murder Mystery Visual Novel",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required for static files'",
+    "start": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "visual-novel",
+    "murder-mystery",
+    "renpy",
+    "interactive-fiction",
+    "game"
+  ],
+  "author": "Hackathon25 Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/bwmm-murder-mystery.git"
+  },
+  "homepage": "https://bwmm-murder-mystery.vercel.app"
+}

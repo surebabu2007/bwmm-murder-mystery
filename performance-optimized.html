@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>BWMM - Performance Optimized</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
+  <link rel="icon" href="icons/icon-72x72.png" sizes="72x72" type="image/png" />
+  <link rel="icon" href="icons/icon-96x96.png" sizes="96x96" type="image/png" />
+  <link rel="icon" href="icons/icon-128x128.png" sizes="128x128" type="image/png" />
+  <link rel="icon" href="icons/icon-144x144.png" sizes="144x144" type="image/png" />
+  <link rel="icon" href="icons/icon-152x152.png" sizes="152x152" type="image/png" />
+  <link rel="icon" href="icons/icon-192x192.png" sizes="192x192" type="image/png" />
+  <link rel="icon" href="icons/icon-384x384.png" sizes="384x384" type="image/png" />
+  <link rel="icon" href="icons/icon-512x512.png" sizes="512x512" type="image/png" />
+  <meta name="theme-color" content="#000" />
+
+  <style>
+    html {
+      background: #444;
+      font-family: sans-serif;
+    }
+
+    body, html {
+      overscroll-behavior: none;
+    }
+
+    #canvas, #overlayDiv {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      border: 0 none;
+    }
+
+    #canvas {
+      background: #000;
+    }
+
+    .visible {
+      visibility: visible;
+      opacity: 1.0;
+      transition: opacity .1s linear;
+    }
+
+    .hidden {
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s .25s, opacity .25s linear;
+    }
+
+    /* Performance Optimized Loading Screen */
+    #loadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: white;
+    }
+
+    #loadingSpinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid #333;
+      border-top: 3px solid #4caf50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #loadingText {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    #loadingProgress {
+      width: 300px;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    #loadingBar {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    #loadingDetails {
+      font-size: 14px;
+      color: #ccc;
+      text-align: center;
+    }
+
+    .performance-warning {
+      background: rgba(255, 152, 0, 0.1);
+      border: 1px solid #ff9800;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px;
+      color: #ff9800;
+      font-size: 14px;
+    }
+
+    #statusDiv, #inputDiv {
+      background: rgba(0, 0, 0, 0.75);
+      width: 50%;
+      margin: auto;
+      min-width: 340px;
+      padding: 10px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      border-radius: 0 0 5px 5px;
+    }
+
+    #statusTextDiv {
+      overflow: auto;
+      max-height: 40vh;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    #statusProgress {
+      display: none;
+      width: 100%;
+    }
+
+    #inputDiv {
+      width: 65%;
+      padding-left: 10px;
+      padding-right: 20px;
+    }
+
+    #inputPrompt {
+      color: #eee;
+      font-size: 150%;
+      margin-bottom: 1em;
+      margin-top: 1em;
+    }
+
+    #inputText {
+      width: 100%;
+      font-size: 175%;
+      padding: 5px;
+      background: inherit;
+      color: #eee;
+    }
+
+    #inputText:focus {
+      color: #ffffff;
+    }
+
+    #ContextContainer {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      color: white;
+    }
+
+    #ContextContainer.shown {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 0px 0px 5px 0px;
+    }
+
+    #ContextButton {
+      text-decoration: none;
+      color: lightgrey;
+      font-size: xx-large;
+      cursor: pointer;
+      user-select: none;
+      -moz-user-select: none;
+      padding: 10px 10px;
+      opacity: .75;
+    }
+
+    #ContextButton:focus {
+      outline: none;
+      color: #ffffff;
+      opacity: 1.0;
+    }
+
+    #ContextMenu a {
+      text-decoration: none;
+      color: lightgrey;
+      background: #444;
+      height: 48px;
+      width: 250px;
+      border-radius: 5px;
+      border: 1px solid lightgrey;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 5px 5px;
+      opacity: 1.0;
+    }
+
+    #ContextMenu a:hover {
+      text-decoration: none;
+      background: #666666;
+      color: #ffffff
+    }
+
+    #presplash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      margin: auto;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Performance Optimized Loading Screen -->
+  <div id="loadingScreen">
+    <div id="loadingSpinner"></div>
+    <div id="loadingText">Loading Blackwood Manor Mystery...</div>
+    <div id="loadingProgress">
+      <div id="loadingBar"></div>
+    </div>
+    <div id="loadingDetails">Initializing Ren'Py Engine...</div>
+    <div class="performance-warning">
+      ⚠️ Large game files detected (21MB WASM). Loading may take 30-60 seconds on slower connections.
+    </div>
+  </div>
+
+  <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+  <div id="overlayDiv"></div>
+  <img id="presplash" src="web-presplash.jpg" style="display: none;">
+
+  <div id="ContextContainer">
+    <a id="ContextButton">&#8801;</a><br />
+    <div id="ContextMenu" style="display: none;">
+      <input id="ID_SavegamesImport" type="file" onchange="onSavegamesImport(this)" accept="application/zip" style=display:none></input>
+      <a href="javascript:document.getElementById('ID_SavegamesImport').click();">Import Saves</a>
+      <a href="javascript:onSavegamesExport();">Export Saves</a>
+      <a href="javascript:FSDownload('/log.txt', 'text/plain');">Download Log</a>
+      <a href="https://www.renpy.org/" target="_blank">Powered by Ren'Py</a>
+    </div>
+  </div>
+
+  <div id="statusDiv" class="hidden">
+    <div id="statusTextDiv"></div>
+    <progress id="statusProgress" value="0" max="100"></progress>
+  </div>
+
+  <div id="inputDiv" class="hidden">
+    <form id="inputForm">
+      <div id="inputPrompt"></div>
+      <input id="inputText" type="text">
+    </form>
+  </div>
+
+  <!-- ElevenLabs ConvAI Widget -->
+  <div id="elevenlabs-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: none; visibility: hidden; opacity: 0; transition: opacity 0.3s ease;">
+    <elevenlabs-convai agent-id="agent_01jypre2sketwapeq2ybartk0k"></elevenlabs-convai>
+  </div>
+
+  <!-- Widget toggle button -->
+  <div id="widget-toggle" style="position: fixed; bottom: 20px; right: 20px; z-index: 1001;">
+    <button id="toggle-btn" onclick="toggleElevenLabsWidget()" style="width: 50px; height: 50px; background: rgba(76, 175, 80, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; cursor: pointer; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2); transition: all 0.3s ease; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent); transform: rotate(45deg); transition: all 0.3s ease;"></div>
+    </button>
+  </div>
+
+  <script>
+    // Performance monitoring
+    const startTime = performance.now();
+    let loadingProgress = 0;
+    const loadingSteps = [
+      'Loading Ren\'Py Engine...',
+      'Loading Game Data...',
+      'Initializing WebAssembly...',
+      'Loading Assets...',
+      'Starting Game...'
+    ];
+    let currentStep = 0;
+
+    function updateLoadingProgress(step, message) {
+      currentStep = step;
+      loadingProgress = (step / loadingSteps.length) * 100;
+      
+      document.getElementById('loadingBar').style.width = loadingProgress + '%';
+      document.getElementById('loadingDetails').textContent = message;
+      
+      console.log(`Loading: ${loadingProgress.toFixed(1)}% - ${message}`);
+    }
+
+    // The URL to game.zip, relative to the URL of this file.
+    window.gameZipURL = 'game.zip';
+
+    // Register the service worker.
+    if (navigator.serviceWorker) {
+        if (!navigator.serviceWorker.controller) {
+            navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'all' });
+        }
+    }
+
+    // Widget state tracking
+    let isWidgetVisible = false;
+
+    // ElevenLabs Widget Control Functions
+    function showElevenLabsWidget() {
+        console.log('Attempting to show ElevenLabs widget...');
+        const widget = document.getElementById('elevenlabs-widget-container');
+        if (widget) {
+            console.log('Widget found, showing...');
+            widget.style.display = 'block';
+            widget.style.visibility = 'visible';
+            widget.style.opacity = '1';
+            isWidgetVisible = true;
+            updateToggleButton();
+        } else {
+            console.log('Widget not found!');
+        }
+    }
+
+    function hideElevenLabsWidget() {
+        console.log('Attempting to hide ElevenLabs widget...');
+        const widget = document.getElementById('elevenlabs-widget-container');
+        if (widget) {
+            console.log('Widget found, hiding...');
+            widget.style.display = 'none';
+            widget.style.visibility = 'hidden';
+            widget.style.opacity = '0';
+            isWidgetVisible = false;
+            updateToggleButton();
+        } else {
+            console.log('Widget not found!');
+        }
+    }
+
+    // Toggle function
+    function toggleElevenLabsWidget() {
+        if (isWidgetVisible) {
+            hideElevenLabsWidget();
+        } else {
+            showElevenLabsWidget();
+        }
+    }
+
+    // Update toggle button appearance
+    function updateToggleButton() {
+        const toggleBtn = document.getElementById('toggle-btn');
+        if (toggleBtn) {
+            if (isWidgetVisible) {
+                toggleBtn.style.background = 'rgba(244, 67, 54, 0.2)';
+                toggleBtn.style.borderColor = 'rgba(244, 67, 54, 0.3)';
+            } else {
+                toggleBtn.style.background = 'rgba(76, 175, 80, 0.2)';
+                toggleBtn.style.borderColor = 'rgba(76, 175, 80, 0.3)';
+            }
+        }
+    }
+
+    // Make functions globally available for Ren'Py
+    window.showElevenLabsWidget = showElevenLabsWidget;
+    window.hideElevenLabsWidget = hideElevenLabsWidget;
+
+    // Performance optimized loading
+    function hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        const presplash = document.getElementById('presplash');
+        
+        // Show presplash first
+        presplash.style.display = 'block';
+        
+        // Hide loading screen after a short delay
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }, 1000);
+    }
+
+    // Monitor Ren'Py loading
+    let renpyLoaded = false;
+    const originalConsoleLog = console.log;
+    console.log = function(...args) {
+        originalConsoleLog.apply(console, args);
+        
+        const message = args.join(' ');
+        if (message.includes('Ren\'Py') && !renpyLoaded) {
+            updateLoadingProgress(1, 'Ren\'Py Engine Loaded');
+        }
+        if (message.includes('game') && !renpyLoaded) {
+            updateLoadingProgress(2, 'Game Data Loaded');
+        }
+        if (message.includes('WebAssembly') && !renpyLoaded) {
+            updateLoadingProgress(3, 'WebAssembly Initialized');
+        }
+    };
+
+    // Wait for Ren'Py to fully load
+    window.addEventListener('load', function() {
+        updateLoadingProgress(4, 'Loading Assets...');
+        
+        // Simulate loading progress
+        const progressInterval = setInterval(() => {
+            if (loadingProgress < 90) {
+                loadingProgress += Math.random() * 5;
+                document.getElementById('loadingBar').style.width = Math.min(loadingProgress, 90) + '%';
+            }
+        }, 200);
+
+        // Check if Ren'Py is ready
+        const checkRenPy = setInterval(() => {
+            if (window.Module && window.Module.ready) {
+                clearInterval(progressInterval);
+                clearInterval(checkRenPy);
+                updateLoadingProgress(5, 'Game Ready!');
+                setTimeout(hideLoadingScreen, 1000);
+                renpyLoaded = true;
+            }
+        }, 100);
+
+        // Fallback timeout
+        setTimeout(() => {
+            clearInterval(progressInterval);
+            clearInterval(checkRenPy);
+            updateLoadingProgress(5, 'Game Ready!');
+            setTimeout(hideLoadingScreen, 1000);
+        }, 30000); // 30 second timeout
+    });
+  </script>
+  <script src="renpy-pre.js"></script>
+  <script async type="text/javascript" src="renpy.js"></script>
+  <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" type="text/javascript"></script>
+</body>
+</html>

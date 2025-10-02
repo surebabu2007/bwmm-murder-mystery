@@ -38,6 +38,14 @@
         {
           "key": "Cross-Origin-Opener-Policy",
           "value": "same-origin"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Content-Encoding",
+          "value": "gzip"
         }
       ]
     },
@@ -47,6 +55,14 @@
         {
           "key": "Content-Type",
           "value": "application/octet-stream"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Content-Encoding",
+          "value": "gzip"
         }
       ]
     },
@@ -56,6 +72,10 @@
         {
           "key": "Content-Type",
           "value": "application/javascript"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -65,6 +85,10 @@
         {
           "key": "Content-Type",
           "value": "application/javascript"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -74,6 +98,10 @@
         {
           "key": "Content-Type",
           "value": "application/zip"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -88,6 +116,15 @@
     },
     {
       "source": "/icons/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(mp3|ogg|webm))$",
       "headers": [
         {
           "key": "Cache-Control",

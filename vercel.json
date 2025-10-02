@@ -43,7 +43,7 @@
       ]
     },
     {
-      "source": "/*.js",
+      "source": "/(.*\\.js)$",
       "headers": [
         {
           "key": "Cache-Control",
@@ -52,7 +52,7 @@
       ]
     },
     {
-      "source": "/*.wasm",
+      "source": "/(.*\\.wasm)$",
       "headers": [
         {
           "key": "Cache-Control",
@@ -61,7 +61,7 @@
       ]
     },
     {
-      "source": "/*.data",
+      "source": "/(.*\\.data)$",
       "headers": [
         {
           "key": "Cache-Control",
@@ -70,7 +70,7 @@
       ]
     },
     {
-      "source": "/*.mp3",
+      "source": "/(.*\\.mp3)$",
       "headers": [
         {
           "key": "Cache-Control",
@@ -79,7 +79,7 @@
       ]
     },
     {
-      "source": "/*.ogg",
+      "source": "/(.*\\.ogg)$",
       "headers": [
         {
           "key": "Cache-Control",
@@ -88,7 +88,7 @@
       ]
     },
     {
-      "source": "/*.webm",
+      "source": "/(.*\\.webm)$",
       "headers": [
         {
           "key": "Cache-Control",

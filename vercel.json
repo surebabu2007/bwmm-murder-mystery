@@ -28,20 +28,16 @@
       "source": "/renpy.wasm",
       "headers": [
         {
+          "key": "Content-Type",
+          "value": "application/wasm"
+        },
+        {
           "key": "Cross-Origin-Embedder-Policy",
           "value": "require-corp"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
           "value": "same-origin"
-        },
-        {
-          "key": "Content-Type",
-          "value": "application/wasm"
-        },
-        {
-          "key": "Cross-Origin-Allow-Origin",
-          "value": "*"
         }
       ]
     },
@@ -51,10 +47,6 @@
         {
           "key": "Content-Type",
           "value": "application/octet-stream"
-        },
-        {
-          "key": "Cross-Origin-Allow-Origin",
-          "value": "*"
         }
       ]
     },
@@ -64,10 +56,6 @@
         {
           "key": "Content-Type",
           "value": "application/javascript"
-        },
-        {
-          "key": "Cross-Origin-Allow-Origin",
-          "value": "*"
         }
       ]
     },
@@ -77,10 +65,6 @@
         {
           "key": "Content-Type",
           "value": "application/javascript"
-        },
-        {
-          "key": "Cross-Origin-Allow-Origin",
-          "value": "*"
         }
       ]
     },
@@ -90,10 +74,6 @@
         {
           "key": "Content-Type",
           "value": "application/zip"
-        },
-        {
-          "key": "Cross-Origin-Allow-Origin",
-          "value": "*"
         }
       ]
     },
@@ -103,10 +83,6 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
-        },
-        {
-          "key": "Cross-Origin-Allow-Origin",
-          "value": "*"
         }
       ]
     },

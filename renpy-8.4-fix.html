@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ren'Py 8.4 Web Build - Blackwood Manor Mystery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .success { background: #2d5a2d; border-color: #4caf50; }
+        .error { background: #5a2d2d; border-color: #f44336; }
+        .warning { background: #5a4d2d; border-color: #ff9800; }
+        .info { background: #2d3d5a; border-color: #2196f3; }
+        .debug-info {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        button:disabled { background: #666; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕵️ Blackwood Manor Mystery - Ren'Py 8.4 Debug</h1>
+        
+        <div id="status"></div>
+        
+        <h2>Ren'Py 8.4 Web Build Status</h2>
+        <div id="renpy-status"></div>
+        
+        <h2>File Loading Test</h2>
+        <div id="file-test"></div>
+        
+        <h2>Browser Compatibility</h2>
+        <div id="browser-info"></div>
+        
+        <h2>Console Logs</h2>
+        <div id="console-logs" class="debug-info"></div>
+        
+        <h2>Actions</h2>
+        <button onclick="testRenPy()">Test Ren'Py Loading</button>
+        <button onclick="clearCache()">Clear Browser Cache</button>
+        <button onclick="openMainGame()">Open Main Game</button>
+        
+        <h2>Ren'Py 8.4 Specific Issues & Solutions</h2>
+        <div class="info">
+            <h3>Common Ren'Py 8.4 Web Issues:</h3>
+            <ul>
+                <li><strong>WASM Loading:</strong> Requires proper CORS headers and content-type</li>
+                <li><strong>SharedArrayBuffer:</strong> Needs HTTPS and proper headers</li>
+                <li><strong>File System:</strong> Ren'Py uses virtual file system</li>
+                <li><strong>Memory:</strong> Large games may need memory optimization</li>
+                <li><strong>Browser Support:</strong> Chrome/Edge work best, Firefox has limitations</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const renpyStatusDiv = document.getElementById('renpy-status');
+        const fileTestDiv = document.getElementById('file-test');
+        const browserInfoDiv = document.getElementById('browser-info');
+        const consoleDiv = document.getElementById('console-logs');
+        
+        let logs = [];
+        
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addLog(type, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${type.toUpperCase()}: ${args.join(' ')}`;
+            logs.push(message);
+            consoleDiv.textContent = logs.join('\n');
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog('log', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog('error', ...args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog('warn', ...args);
+        };
+        
+        // Check browser compatibility
+        function checkBrowserCompatibility() {
+            const browserInfo = {
+                userAgent: navigator.userAgent,
+                webgl: !!window.WebGLRenderingContext,
+                webgl2: !!window.WebGL2RenderingContext,
+                wasm: !!window.WebAssembly,
+                sharedArrayBuffer: !!window.SharedArrayBuffer,
+                crossOriginIsolated: window.crossOriginIsolated,
+                https: location.protocol === 'https:',
+                localStorage: !!window.localStorage,
+                indexedDB: !!window.indexedDB
+            };
+            
+            let compatibility = '✅ Good';
+            let issues = [];
+            
+            if (!browserInfo.wasm) {
+                compatibility = '❌ Poor';
+                issues.push('WebAssembly not supported');
+            }
+            
+            if (!browserInfo.webgl) {
+                compatibility = '❌ Poor';
+                issues.push('WebGL not supported');
+            }
+            
+            if (!browserInfo.sharedArrayBuffer) {
+                compatibility = '⚠️ Limited';
+                issues.push('SharedArrayBuffer not available (may affect performance)');
+            }
+            
+            if (!browserInfo.https) {
+                compatibility = '⚠️ Limited';
+                issues.push('HTTPS required for full functionality');
+            }
+            
+            if (!browserInfo.crossOriginIsolated) {
+                compatibility = '⚠️ Limited';
+                issues.push('Cross-origin isolation not enabled');
+            }
+            
+            browserInfoDiv.innerHTML = `
+                <div class="status ${compatibility.includes('✅') ? 'success' : compatibility.includes('⚠️') ? 'warning' : 'error'}">
+                    <strong>Compatibility: ${compatibility}</strong>
+                    ${issues.length > 0 ? '<br>Issues: ' + issues.join(', ') : ''}
+                </div>
+                <div class="debug-info">
+                    WebAssembly: ${browserInfo.wasm ? '✅' : '❌'}<br>
+                    WebGL: ${browserInfo.webgl ? '✅' : '❌'}<br>
+                    WebGL2: ${browserInfo.webgl2 ? '✅' : '❌'}<br>
+                    SharedArrayBuffer: ${browserInfo.sharedArrayBuffer ? '✅' : '❌'}<br>
+                    Cross-Origin Isolated: ${browserInfo.crossOriginIsolated ? '✅' : '❌'}<br>
+                    HTTPS: ${browserInfo.https ? '✅' : '❌'}<br>
+                    Local Storage: ${browserInfo.localStorage ? '✅' : '❌'}<br>
+                    IndexedDB: ${browserInfo.indexedDB ? '✅' : '❌'}
+                </div>
+            `;
+        }
+        
+        // Test file loading
+        async function testFileLoading() {
+            const files = [
+                'renpy.js',
+                'renpy.wasm',
+                'renpy.data',
+                'renpy-pre.js',
+                'game.zip',
+                'index.html'
+            ];
+            
+            let loaded = 0;
+            let total = files.length;
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    if (response.ok) {
+                        fileTestDiv.innerHTML += `<div class="success">✅ ${file} - ${response.status} ${response.statusText}</div>`;
+                        loaded++;
+                    } else {
+                        fileTestDiv.innerHTML += `<div class="error">❌ ${file} - ${response.status} ${response.statusText}</div>`;
+                    }
+                } catch (error) {
+                    fileTestDiv.innerHTML += `<div class="error">❌ ${file} - Network Error: ${error.message}</div>`;
+                }
+            }
+            
+            if (loaded === total) {
+                statusDiv.innerHTML = '<div class="success">🎉 All files loaded successfully! Ren\'Py should work.</div>';
+            } else {
+                statusDiv.innerHTML = `<div class="warning">⚠️ Only ${loaded}/${total} files loaded. Check file status above.</div>`;
+            }
+        }
+        
+        // Test Ren'Py specific loading
+        async function testRenPy() {
+            renpyStatusDiv.innerHTML = '<div class="info">🔄 Testing Ren\'Py 8.4 loading...</div>';
+            
+            try {
+                // Test WASM loading
+                const wasmResponse = await fetch('renpy.wasm');
+                if (wasmResponse.ok) {
+                    renpyStatusDiv.innerHTML += '<div class="success">✅ renpy.wasm loaded successfully</div>';
+                } else {
+                    renpyStatusDiv.innerHTML += '<div class="error">❌ renpy.wasm failed to load</div>';
+                }
+                
+                // Test data file
+                const dataResponse = await fetch('renpy.data');
+                if (dataResponse.ok) {
+                    renpyStatusDiv.innerHTML += '<div class="success">✅ renpy.data loaded successfully</div>';
+                } else {
+                    renpyStatusDiv.innerHTML += '<div class="error">❌ renpy.data failed to load</div>';
+                }
+                
+                // Test game.zip
+                const gameResponse = await fetch('game.zip');
+                if (gameResponse.ok) {
+                    renpyStatusDiv.innerHTML += '<div class="success">✅ game.zip loaded successfully</div>';
+                } else {
+                    renpyStatusDiv.innerHTML += '<div class="error">❌ game.zip failed to load</div>';
+                }
+                
+            } catch (error) {
+                renpyStatusDiv.innerHTML += `<div class="error">❌ Ren'Py test failed: ${error.message}</div>`;
+            }
+        }
+        
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            localStorage.clear();
+            sessionStorage.clear();
+            statusDiv.innerHTML = '<div class="info">🔄 Cache cleared. Please refresh the page.</div>';
+        }
+        
+        function openMainGame() {
+            window.open('index.html', '_blank');
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            console.log('Ren\'Py 8.4 Debug Page Loaded');
+            checkBrowserCompatibility();
+            testFileLoading();
+        });
+    </script>
+</body>
+</html>

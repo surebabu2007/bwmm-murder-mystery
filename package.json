@@ -16,8 +16,8 @@
     "interactive-fiction",
     "game"
   ],
-  "author": "Hackathon25 Team",
-  "license": "MIT",
+  "author": "Token Cluster (Suresh & Dennis) - Hackathon Project",
+  "license": "All rights reserved under Token Cluster (Suresh & Dennis) - Hackathon Project",
   "engines": {
     "node": ">=14.0.0"
   },

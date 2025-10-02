@@ -107,7 +107,7 @@ If the game doesn't load:
 
 ## 📄 License
 
-MIT License - See LICENSE file for details.
+All rights reserved under Token Cluster (Suresh & Dennis) - Hackathon Project.
 
 ## 🤝 Contributing
 

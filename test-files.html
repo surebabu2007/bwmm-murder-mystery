@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Access Test - BWMM</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #333; color: white; }
+        .status { padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .success { background: #2d5a2d; }
+        .error { background: #5a2d2d; }
+        .info { background: #2d3d5a; }
+    </style>
+</head>
+<body>
+    <h1>🔍 File Access Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const files = [
+            'renpy.js',
+            'renpy.wasm', 
+            'renpy.data',
+            'renpy-pre.js',
+            'game.zip',
+            'index.html',
+            'web-presplash.jpg'
+        ];
+        
+        const resultsDiv = document.getElementById('results');
+        
+        async function testFiles() {
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        resultsDiv.innerHTML += `<div class="status success">✅ ${file} - ${response.status} (${response.headers.get('content-type')})</div>`;
+                    } else {
+                        resultsDiv.innerHTML += `<div class="status error">❌ ${file} - ${response.status} ${response.statusText}</div>`;
+                    }
+                } catch (error) {
+                    resultsDiv.innerHTML += `<div class="status error">❌ ${file} - Error: ${error.message}</div>`;
+                }
+            }
+        }
+        
+        testFiles();
+    </script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElevenLabs Widget Test - BWMM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #2d5a2d; }
+        .error { background: #5a2d2d; }
+        .warning { background: #5a4d2d; }
+        .info { background: #2d3d5a; }
+        button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        #widget-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #widget-container.visible {
+            display: block;
+            visibility: visible;
+            opacity: 1;
+        }
+        .toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            width: 60px;
+            height: 60px;
+            background: rgba(76, 175, 80, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 ElevenLabs Widget Test</h1>
+        
+        <div class="test-section">
+            <h2>📊 Connection Tests</h2>
+            <div id="connection-tests"></div>
+            <button onclick="runConnectionTests()">Run Tests</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🌐 CORS & Security Tests</h2>
+            <div id="cors-tests"></div>
+            <button onclick="runCorsTests()">Test CORS</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📱 Widget Tests</h2>
+            <div id="widget-tests"></div>
+            <button onclick="testWidget()">Test Widget</button>
+            <button onclick="toggleWidget()">Toggle Widget</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Debug Information</h2>
+            <div id="debug-info"></div>
+            <button onclick="showDebugInfo()">Show Debug Info</button>
+        </div>
+    </div>
+
+    <!-- Widget Container -->
+    <div id="widget-container">
+        <elevenlabs-convai agent-id="agent_01jypre2sketwapeq2ybartk0k"></elevenlabs-convai>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-btn" onclick="toggleWidget()" id="toggle-btn">🎤</button>
+
+    <script>
+        let widgetVisible = false;
+
+        function addStatus(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+
+        function clearStatus(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        async function runConnectionTests() {
+            clearStatus('connection-tests');
+            addStatus('connection-tests', 'Testing connections...', 'info');
+
+            // Test ElevenLabs CDN
+            try {
+                const response = await fetch('https://unpkg.com/@elevenlabs/convai-widget-embed');
+                if (response.ok) {
+                    addStatus('connection-tests', '✅ ElevenLabs CDN accessible', 'success');
+                } else {
+                    addStatus('connection-tests', '❌ ElevenLabs CDN failed: ' + response.status, 'error');
+                }
+            } catch (error) {
+                addStatus('connection-tests', '❌ ElevenLabs CDN error: ' + error.message, 'error');
+            }
+
+            // Test current domain
+            try {
+                const response = await fetch(window.location.origin);
+                if (response.ok) {
+                    addStatus('connection-tests', '✅ Current domain accessible', 'success');
+                } else {
+                    addStatus('connection-tests', '❌ Current domain failed: ' + response.status, 'error');
+                }
+            } catch (error) {
+                addStatus('connection-tests', '❌ Current domain error: ' + error.message, 'error');
+            }
+        }
+
+        async function runCorsTests() {
+            clearStatus('cors-tests');
+            addStatus('cors-tests', 'Testing CORS policies...', 'info');
+
+            // Test if we can make cross-origin requests
+            try {
+                const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.status === 401) {
+                    addStatus('cors-tests', '✅ CORS working (401 = auth required, not CORS issue)', 'success');
+                } else if (response.status === 200) {
+                    addStatus('cors-tests', '✅ CORS working (200 = success)', 'success');
+                } else {
+                    addStatus('cors-tests', `⚠️ CORS test: ${response.status}`, 'warning');
+                }
+            } catch (error) {
+                if (error.message.includes('CORS')) {
+                    addStatus('cors-tests', '❌ CORS blocked: ' + error.message, 'error');
+                } else {
+                    addStatus('cors-tests', '⚠️ CORS test error: ' + error.message, 'warning');
+                }
+            }
+
+            // Test iframe permissions
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = 'about:blank';
+                document.body.appendChild(iframe);
+                
+                try {
+                    iframe.contentWindow.document.write('<html><body>Test</body></html>');
+                    addStatus('cors-tests', '✅ iframe permissions working', 'success');
+                } catch (e) {
+                    addStatus('cors-tests', '❌ iframe permissions blocked: ' + e.message, 'error');
+                }
+                
+                document.body.removeChild(iframe);
+            } catch (error) {
+                addStatus('cors-tests', '❌ iframe test failed: ' + error.message, 'error');
+            }
+        }
+
+        function testWidget() {
+            clearStatus('widget-tests');
+            addStatus('widget-tests', 'Testing widget...', 'info');
+
+            const widget = document.getElementById('widget-container');
+            const convaiElement = widget.querySelector('elevenlabs-convai');
+            
+            if (widget) {
+                addStatus('widget-tests', '✅ Widget container found', 'success');
+            } else {
+                addStatus('widget-tests', '❌ Widget container not found', 'error');
+            }
+
+            if (convaiElement) {
+                addStatus('widget-tests', '✅ ElevenLabs ConvAI element found', 'success');
+            } else {
+                addStatus('widget-tests', '❌ ElevenLabs ConvAI element not found', 'error');
+            }
+
+            // Check if custom elements are defined
+            if (customElements.get('elevenlabs-convai')) {
+                addStatus('widget-tests', '✅ Custom element registered', 'success');
+            } else {
+                addStatus('widget-tests', '❌ Custom element not registered', 'error');
+            }
+
+            // Test widget visibility
+            if (widgetVisible) {
+                addStatus('widget-tests', '✅ Widget is visible', 'success');
+            } else {
+                addStatus('widget-tests', 'ℹ️ Widget is hidden (normal)', 'info');
+            }
+        }
+
+        function toggleWidget() {
+            const widget = document.getElementById('widget-container');
+            const toggleBtn = document.getElementById('toggle-btn');
+            
+            widgetVisible = !widgetVisible;
+            
+            if (widgetVisible) {
+                widget.classList.add('visible');
+                toggleBtn.textContent = '❌';
+                toggleBtn.style.background = 'rgba(244, 67, 54, 0.2)';
+                addStatus('widget-tests', 'Widget shown', 'success');
+            } else {
+                widget.classList.remove('visible');
+                toggleBtn.textContent = '🎤';
+                toggleBtn.style.background = 'rgba(76, 175, 80, 0.2)';
+                addStatus('widget-tests', 'Widget hidden', 'info');
+            }
+        }
+
+        function showDebugInfo() {
+            clearStatus('debug-info');
+            
+            addStatus('debug-info', `User Agent: ${navigator.userAgent}`, 'info');
+            addStatus('debug-info', `Current URL: ${window.location.href}`, 'info');
+            addStatus('debug-info', `Protocol: ${window.location.protocol}`, 'info');
+            addStatus('debug-info', `Domain: ${window.location.hostname}`, 'info');
+            addStatus('debug-info', `HTTPS: ${window.location.protocol === 'https:'}`, 'info');
+            
+            // Check for security policies
+            const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+            if (csp) {
+                addStatus('debug-info', `CSP: ${csp.content}`, 'warning');
+            } else {
+                addStatus('debug-info', 'No CSP found', 'info');
+            }
+
+            // Check for COOP/COEP headers
+            addStatus('debug-info', 'Note: Check Network tab for COOP/COEP headers', 'info');
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                runConnectionTests();
+                runCorsTests();
+                testWidget();
+                showDebugInfo();
+            }, 1000);
+        });
+    </script>
+    
+    <!-- Load ElevenLabs Widget -->
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" type="text/javascript"></script>
+</body>
+</html>
